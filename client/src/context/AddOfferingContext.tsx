@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createContext, ReactNode, useCallback, useState } from "react";
 import { ADD_OFFERING_STEPS } from "../constants";
+import { Image } from "../types";
 
 // Define Context Type
 export interface AddOfferingContextType {
@@ -12,16 +13,18 @@ export interface AddOfferingContextType {
   prevStep: () => void;
   resetSteps: () => void;
   addStep: (step: string) => void;
-  caseStudy: File | null;
-  setCaseStudy: React.Dispatch<React.SetStateAction<File | null>>;
-  companyLogo: File | null;
-  setCompanyLogo: React.Dispatch<React.SetStateAction<File | null>>;
+  caseStudy: Image | null;
+  setCaseStudy: React.Dispatch<React.SetStateAction<Image | null>>;
+  companyLogo: Image | null;
+  setCompanyLogo: React.Dispatch<React.SetStateAction<Image | null>>;
   formData: any;
   setFormData: React.Dispatch<React.SetStateAction<any>>;
   offerings: any[];
   setOfferings: React.Dispatch<React.SetStateAction<any[]>>;
   complete: boolean;
   setComplete: React.Dispatch<React.SetStateAction<boolean>>;
+  caseStudyFile: File | null;
+  setCaseStudyFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
 export const AddOfferingContext = createContext<AddOfferingContextType | null>(
@@ -36,10 +39,11 @@ export const AddOfferingContextProvider = ({
   const [formData, setFormData] = useState<any>(null);
   const [offerings, setOfferings] = useState<any[]>([]);
   const [steps, setSteps] = useState<string[]>([""]);
+  const [caseStudyFile, setCaseStudyFile] = useState<File | null>(null)
   const [step, setStep] = useState<number>(1);
   const [complete, setComplete] = useState(false);
-  const [caseStudy, setCaseStudy] = useState<File | null>(null);
-  const [companyLogo, setCompanyLogo] = useState<File | null>(null);
+  const [caseStudy, setCaseStudy] = useState<Image | null>(null);
+  const [companyLogo, setCompanyLogo] = useState<Image | null>(null);
 
   const nextStep = useCallback(() => {
     step === ADD_OFFERING_STEPS.length
@@ -86,6 +90,7 @@ export const AddOfferingContextProvider = ({
     setOfferings,
     complete,
     setComplete,
+    caseStudyFile, setCaseStudyFile
   };
 
   return (

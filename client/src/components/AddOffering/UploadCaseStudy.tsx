@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MdCloudUpload } from "react-icons/md";
 import { useAddOfferingContext } from "../../hooks/useGlobalState";
 import { useSnackbar } from "notistack";
+import { uploadCaseStudy } from "../../config";
 
 const UploadCaseStudy = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { setCaseStudy } = useAddOfferingContext();
+  const { setCaseStudy, setCaseStudyFile } = useAddOfferingContext();
 
-  const handleUploadCaseStudy = (
+  const handleUploadCaseStudy = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files![0] as File;
@@ -31,7 +33,16 @@ const UploadCaseStudy = () => {
       return;
     }
 
-    setCaseStudy(file);
+    const formData = new FormData();
+    formData.append("caseStudy", file);
+
+    try {
+      const data = await uploadCaseStudy(formData);
+      setCaseStudy(data);
+      setCaseStudyFile(file)
+    } catch (error: any) {
+      enqueueSnackbar(error.response?.data?.message, { variant: "error" });
+    }
   };
 
   return (

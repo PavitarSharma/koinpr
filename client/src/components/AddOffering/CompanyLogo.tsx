@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { MdCloudUpload } from "react-icons/md";
 import { AiOutlineEdit } from "react-icons/ai";
 import { IoTrashOutline } from "react-icons/io5";
 import { useAddOfferingContext } from "../../hooks/useGlobalState";
 import { useSnackbar } from "notistack";
+import { uploadCompanyLogo } from "../../config";
 
 const CompanyLogo = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -29,12 +31,21 @@ const CompanyLogo = () => {
 
     const img = new Image();
     img.src = URL.createObjectURL(file);
-    img.onload = () => {
-      if (img.width > 800 || img.height > 400) {
-        enqueueSnackbar("Maximum dimensions: 800x400px", { variant: "error" });
-        return;
+    img.onload = async () => {
+      // if (img.width > 800 || img.height > 400) {
+      //   enqueueSnackbar("Maximum dimensions: 800x400px", { variant: "error" });
+      //   return;
+      // }
+
+      const formData = new FormData();
+      formData.append("companyLogo", file);
+   
+      try {
+        const data = await uploadCompanyLogo(formData);
+        setCompanyLogo(data);
+      } catch (error: any) {
+        enqueueSnackbar(error.response?.data?.message, { variant: "error" });
       }
-      setCompanyLogo(file);
     };
   };
 
@@ -47,7 +58,7 @@ const CompanyLogo = () => {
       {companyLogo ? (
         <div className="flex flex-col h-40 border border-[#DADADA] rounded-lg cursor-pointer bg-gray-50 max-w-[281px] w-full border-b-0">
           <img
-            src={URL.createObjectURL(companyLogo)}
+            src={companyLogo.url}
             alt="companyLogo"
             className="w-full object-contain h-[calc(100%_-_44px)]"
           />
@@ -84,7 +95,7 @@ const CompanyLogo = () => {
             <MdCloudUpload className="text-gray-500 w-10 h-10" />
             <p className="mb-2 text-gray-700">Click to upload</p>
             <p className="text-xs text-[#5E5E5E]">
-              SVG, PNG, JPG or JPEG(MAX. 800x400px)
+              SVG, PNG, JPG or JPEG
             </p>
           </div>
           <input

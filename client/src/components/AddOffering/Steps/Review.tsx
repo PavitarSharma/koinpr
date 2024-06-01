@@ -7,15 +7,29 @@ import { formatPrice } from "../../../utils";
 import { useSnackbar } from "notistack";
 import Button from "../../Button";
 import Title from "../../Title";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { axiosInstance, uploadCaseStudy } from "../../../config";
 
 const ReviewStep = () => {
+  const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
-  const { formData, offerings, companyLogo, setStep, setCaseStudy } =
-    useAddOfferingContext();
+  const {
+    formData,
+    offerings,
+    companyLogo,
+    setStep,
+    setCaseStudy,
+    caseStudy,
+    caseStudyFile,
+    setCaseStudyFile,
+    setFormData,
+    setCompanyLogo,
+    setOfferings,
+  } = useAddOfferingContext();
   const languages = formData.contentLanguages?.map((lang: any) => lang.value);
   const regions = formData.regions?.map((reg: any) => reg.value);
 
-  const handleUploadCaseStudy = (
+  const handleUploadCaseStudy = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files![0] as File;
@@ -40,7 +54,53 @@ const ReviewStep = () => {
       return;
     }
 
-    setCaseStudy(file);
+    const formData = new FormData();
+    formData.append("caseStudy", file);
+
+    try {
+      const data = await uploadCaseStudy(formData);
+      setCaseStudy(data);
+      setCaseStudyFile(file);
+    } catch (error: any) {
+      enqueueSnackbar(error.response?.data?.message, { variant: "error" });
+    }
+  };
+
+  const mutation = useMutation({
+    mutationFn: async (newContent) => {
+      return await axiosInstance.post("/contents", newContent);
+    },
+    onSuccess: () => {
+      enqueueSnackbar("Offering created successfully", { variant: "success" });
+      queryClient.invalidateQueries({ queryKey: ["contents"] });
+    },
+    onError: (error: any) => {
+      enqueueSnackbar(error?.response?.data?.message, { variant: "error" });
+    },
+  });
+
+  const onSubmit = () => {
+    const newContent = {
+      ...formData,
+      category: formData.category.value,
+      contentLanguages: languages,
+      regions,
+      caseStudy,
+      companyLogo,
+      offerings: offerings.map((offering) => ({
+        mediaKitPrice: Number(offering.mediaKitPrice),
+        discountPrice: Number(offering.discountPrice) || 0,
+        features: offering.features.map((feature: any) => feature.value),
+        offering: offering.offering.value,
+      })),
+    };
+
+    mutation.mutate(newContent);
+    setStep(1);
+    setFormData(null);
+    setCompanyLogo(null);
+    setCaseStudy(null);
+    setOfferings([]);
   };
 
   return (
@@ -66,16 +126,15 @@ const ReviewStep = () => {
           title="Website Description"
           subTitle={formData.websiteDescription}
         />
-        <ReviewDetail
-          title="Company Logo"
-          isImg
-          subTitle={URL.createObjectURL(companyLogo as File)}
-        />
+        <ReviewDetail title="Company Logo" isImg subTitle={companyLogo?.url} />
         <ReviewDetail
           title="Official Email"
           subTitle={formData.officialEmail}
         />
-        <ReviewDetail title="Telegram ID" subTitle={formData.telegramId} />
+        <ReviewDetail
+          title="Telegram ID"
+          subTitle={`@${formData.telegramId}`}
+        />
         <div className="space-y-2">
           <p className="text-xl text-[#5E5E5E]">Languages</p>
           <ul className="flex items-center gap-1">
@@ -118,11 +177,13 @@ const ReviewStep = () => {
         <div>
           <p className="text-xl">Uploaded Doc</p>
 
-          <div className="flex items-center h-12 max-w-[273px] w-full mt-3 border border-gray-200">
+          <div className="flex items-center h-12  w-max mt-3 border border-gray-200">
             <div className="h-full flex items-center justify-center w-9 border-0 bg-[#d9d9d9] rounded-l">
               <FaRegFileLines size={20} className="" />
             </div>
-            <span className="flex-1 text-center">File Name 1234</span>
+            <span className="flex-1 text-center px-4">
+              {caseStudyFile?.name}
+            </span>
             <button className="px-6 rounded-r flex items-center justify-center border-l border-gray-200">
               View
             </button>
@@ -181,7 +242,7 @@ const ReviewStep = () => {
           ))}
         </div>
 
-        <Button label="Done" onClick={() => {}} />
+        <Button label="Done" onClick={onSubmit} />
       </div>
     </>
   );
