@@ -1,4 +1,3 @@
-import React from "react";
 import ReactSelect, { ActionMeta, MultiValue, SingleValue } from "react-select";
 
 // Define a type for options
