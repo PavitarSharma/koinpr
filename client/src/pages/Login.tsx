@@ -25,6 +25,10 @@ const Login = () => {
   });
 
   useEffect(() => {
+    document.title = "Login"
+  }, [])
+
+  useEffect(() => {
     if(user) {
       navigate("/")
     }

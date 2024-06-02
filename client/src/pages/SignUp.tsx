@@ -6,7 +6,7 @@ import { Button, Input } from "../components";
 import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../config";
 import { useSnackbar } from "notistack";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Schema = z.infer<typeof SignUpFormSchema>;
 
@@ -25,6 +25,10 @@ const SignUp = () => {
       name: "",
     },
   });
+
+  useEffect(() => {
+    document.title = "Sign Up"
+  }, [])
 
   const onSubmit = async (data: Schema) => {
     setLoading(true);

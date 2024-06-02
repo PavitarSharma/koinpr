@@ -10,6 +10,12 @@ export const uploadCompanyLogo = async (formData: FormData) => {
     return response.data
 }
 
+export const deleteCompanyLogo = async (id: string) => {
+    const response = await axiosInstance.post("/contents/upload/companyLogo", {id})
+
+    return response.data
+}
+
 export const uploadCaseStudy = async (formData: FormData) => {
     const response = await axiosInstance.post("/contents/upload/caseStudy", formData, {
         headers: {

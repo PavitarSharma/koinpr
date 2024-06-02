@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
-import { ErrorHandler, UploadedFile, uploadImage } from "../utils";
+import { deleteImage, ErrorHandler, UploadedFile, uploadImage } from "../utils";
 import { contentService } from "../services";
 import { upload } from "../middlewares";
 
@@ -33,7 +33,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     }
 })
 
-router.post("/upload/companyLogo", upload.single("companyLogo"), async(req: Request, res: Response, next: NextFunction) => {
+router.post("/upload/companyLogo", upload.single("companyLogo"), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const data = await uploadImage(req.file as UploadedFile)
         res.status(200).json(data)
@@ -42,7 +42,18 @@ router.post("/upload/companyLogo", upload.single("companyLogo"), async(req: Requ
     }
 })
 
-router.post("/upload/caseStudy", upload.single("caseStudy"), async(req: Request, res: Response, next: NextFunction) => {
+router.post("/companyLogo/delete", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await deleteImage(req.body.id)
+        res.status(200).json({
+            message: "Deleted successfully"
+        })
+    } catch (error: any) {
+        return next(new ErrorHandler(500, error.message))
+    }
+})
+
+router.post("/upload/caseStudy", upload.single("caseStudy"), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const data = await uploadImage(req.file as UploadedFile)
         res.status(200).json(data)

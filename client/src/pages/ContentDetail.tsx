@@ -20,14 +20,20 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { axiosInstance } from "../config";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuthContext } from "../hooks/useGlobalState";
 
 const ContentDetail = () => {
+  const {user} = useAuthContext()
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const { contentId, offeringId } = useParams();
   const { data } = useContent(contentId as string);
   const [message, setMessage] = useState("")
+
+  useEffect(() => {
+    document.title = "Product Detail"
+  }, [])
 
   const addToCartMutation = useMutation({
     mutationKey: ["carts", { action: "addToCart" }],
@@ -67,6 +73,10 @@ const ContentDetail = () => {
   const { mediaKitPrice } = offering as IOffering;
 
   const handleAddToCart = async () => {
+    if(!user) {
+      enqueueSnackbar("Please login to add to cart", { variant: "error" });
+      return
+    }
     const data = {
       contentId,
       offeringId,

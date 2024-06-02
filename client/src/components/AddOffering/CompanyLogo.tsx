@@ -5,7 +5,7 @@ import { AiOutlineEdit } from "react-icons/ai";
 import { IoTrashOutline } from "react-icons/io5";
 import { useAddOfferingContext } from "../../hooks/useGlobalState";
 import { useSnackbar } from "notistack";
-import { uploadCompanyLogo } from "../../config";
+import { deleteCompanyLogo, uploadCompanyLogo } from "../../config";
 
 const CompanyLogo = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -39,7 +39,7 @@ const CompanyLogo = () => {
 
       const formData = new FormData();
       formData.append("companyLogo", file);
-   
+
       try {
         const data = await uploadCompanyLogo(formData);
         setCompanyLogo(data);
@@ -49,8 +49,14 @@ const CompanyLogo = () => {
     };
   };
 
-  const handleCompanyLogoDelete = () => {
-    setCompanyLogo(null);
+  const handleCompanyLogoDelete = async () => {
+    try {
+      await deleteCompanyLogo(companyLogo?.id as string);
+      enqueueSnackbar("Deleted Successfully", { variant: "success" });
+      setCompanyLogo(null);
+    } catch (error: any) {
+      enqueueSnackbar(error.response?.data?.message, { variant: "error" });
+    }
   };
 
   return (
@@ -78,6 +84,7 @@ const CompanyLogo = () => {
             </label>
 
             <button
+              type="button"
               onClick={handleCompanyLogoDelete}
               className="flex items-center justify-center gap-2"
             >
@@ -94,9 +101,7 @@ const CompanyLogo = () => {
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <MdCloudUpload className="text-gray-500 w-10 h-10" />
             <p className="mb-2 text-gray-700">Click to upload</p>
-            <p className="text-xs text-[#5E5E5E]">
-              SVG, PNG, JPG or JPEG
-            </p>
+            <p className="text-xs text-[#5E5E5E]">SVG, PNG, JPG or JPEG</p>
           </div>
           <input
             id="companyLogo"

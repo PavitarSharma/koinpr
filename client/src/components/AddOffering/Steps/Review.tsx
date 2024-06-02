@@ -184,9 +184,9 @@ const ReviewStep = () => {
             <span className="flex-1 text-center px-4">
               {caseStudyFile?.name}
             </span>
-            <button className="px-6 rounded-r flex items-center justify-center border-l border-gray-200">
+            <a href={caseStudy?.url} target="_blank" className="px-6 rounded-r flex items-center justify-center border-l border-gray-200">
               View
-            </button>
+            </a>
           </div>
         </div>
 

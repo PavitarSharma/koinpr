@@ -35,7 +35,7 @@ const Topbar = () => {
 
           <button
             onClick={filterStore.onOpen}
-            className="border border-gray-300 rounded p-4"
+            className="border border-gray-300 rounded p-4 lg:hidden block"
           >
             <FaFilter />
           </button>

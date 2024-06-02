@@ -8,18 +8,20 @@ import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 import { Country, State } from "country-state-city";
 import { BillingFormSchema } from "../schemas";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useUploadDocModal } from "../store";
 import { ICart, Image } from "../types";
 import useCarts from "../hooks/useCarts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../config";
 import { useSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthContext } from "../hooks/useGlobalState";
 
 type Schema = z.infer<typeof BillingFormSchema>;
 const Cart = () => {
-  const navigate = useNavigate()
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
   const { data: cartsData } = useCarts();
@@ -39,6 +41,10 @@ const Cart = () => {
       state: { value: "", label: "" },
     },
   });
+
+  useEffect(() => {
+    document.title = "Cart";
+  }, []);
 
   const countries = Country.getAllCountries().map((country) => ({
     value: country.name,
@@ -107,21 +113,16 @@ const Cart = () => {
 
   const { total, subTotal, totalPrice } = calculateCartTotals(cartsData);
 
-
   const createOrderMutation = useMutation({
     mutationKey: ["users", { action: "createOrder" }],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mutationFn: async (data: any) => {
-      const response = await axiosInstance.post(
-        `/orders/create`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("todayqToken")}`,
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await axiosInstance.post(`/orders/create`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("todayqToken")}`,
+        },
+        withCredentials: true,
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -130,7 +131,7 @@ const Cart = () => {
       enqueueSnackbar("Order created successfully", {
         variant: "success",
       });
-      navigate("/success")
+      navigate("/success");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -138,8 +139,11 @@ const Cart = () => {
     },
   });
 
-
   const onSubmit = (data: Schema) => {
+    if (!user) {
+      enqueueSnackbar("Please login to checkout", { variant: "error" });
+      return;
+    }
     const cartIds = cartsData.map((cart: ICart) => cart._id);
     const billingData = {
       totalPrice,
@@ -149,7 +153,7 @@ const Cart = () => {
         state: data.state.value,
       },
       paymentMethod,
-      cart: cartIds
+      cart: cartIds,
     };
 
     createOrderMutation.mutate(billingData);
@@ -169,72 +173,82 @@ const Cart = () => {
             <h5 className="font-semibold">Items</h5>
 
             <div className="my-4 flex flex-col gap-6">
-              {cartsData?.length > 0
-                ? cartsData &&
-                  cartsData?.map((obj: ICart, index: number) => {
-                    const {
-                      content: { companyLogo, websiteName, websiteDescription },
-                      contentOffering: { mediaKitPrice },
-                    } = obj;
-                    return (
-                      <div
-                        key={index}
-                        className="relative flex flex-1 md:flex-row flex-col justify-between gap-6"
-                      >
-                        <div className="flex gap-4">
-                          <img
-                            src={companyLogo.url}
-                            alt={companyLogo.id}
-                            className="w-10 h-10 object-cover rounded-full"
-                          />
-                          <div className="flex-1 flex flex-col">
-                            <h3 className="font-semibold">{websiteName}</h3>
-                            <p className="text-[#5E5E5E]">
-                              {websiteDescription.length > 70
-                                ? websiteDescription.substring(0, 100) + "..."
-                                : websiteDescription}
-                            </p>
-                            <p className="text-xl font-semibold">
-                              {formatPrice(Number(mediaKitPrice))}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-6 md:items-start items-center">
-                          <div className="flex gap-2 items-center md:flex-col flex-row">
-                            <button
-                              onClick={() => handleUploadDoc(obj)}
-                              className="bg-[#E4E4E4]/60 px-6 py-2 rounded-lg flex items-center justify-center gap-2 text-sm"
-                            >
-                              <AiOutlineCloudUpload size={20} />
-                              <span className="text-sm flex-1">Upload Doc</span>
-                            </button>
-                            <span>or</span>
-                            <div className="bg-[#E4E4E4]/60 px-6 py-2 rounded-lg flex items-center justify-center gap-2 text-sm">
-                              <input
-                                type="checkbox"
-                                checked={
-                                  (getWritten[obj._id] !== undefined &&
-                                    getWritten[obj._id]) ||
-                                  obj.getWritten ||
-                                  false
-                                }
-                                onChange={(e) => handleGetWritten(e, obj?._id)}
-                                className="w-4 h-4 bg-transparent"
-                              />
-                              <span className="text-sm flex-1">
-                                Get it written
-                              </span>
-                            </div>
-                          </div>
-                          <button>
-                            <IoMdClose size={20} />
-                          </button>
+              {cartsData?.length > 0 ? (
+                cartsData &&
+                cartsData?.map((obj: ICart, index: number) => {
+                  const {
+                    content: { companyLogo, websiteName, websiteDescription },
+                    contentOffering: { mediaKitPrice },
+                  } = obj;
+                  return (
+                    <div
+                      key={index}
+                      className="relative flex flex-1 md:flex-row flex-col justify-between gap-6"
+                    >
+                      <div className="flex gap-4">
+                        <img
+                          src={companyLogo.url}
+                          alt={companyLogo.id}
+                          className="w-10 h-10 object-cover rounded-full"
+                        />
+                        <div className="flex-1 flex flex-col">
+                          <h3 className="font-semibold">{websiteName}</h3>
+                          <p className="text-[#5E5E5E]">
+                            {websiteDescription.length > 70
+                              ? websiteDescription.substring(0, 100) + "..."
+                              : websiteDescription}
+                          </p>
+                          <p className="text-xl font-semibold">
+                            {formatPrice(Number(mediaKitPrice))}
+                          </p>
                         </div>
                       </div>
-                    );
-                  })
-                : "No Items"}
+
+                      <div className="flex gap-6 md:items-start items-center">
+                        <div className="flex gap-2 items-center md:flex-col flex-row">
+                          <button
+                            onClick={() => handleUploadDoc(obj)}
+                            className="bg-[#E4E4E4]/60 px-6 py-2 rounded-lg flex items-center justify-center gap-2 text-sm"
+                          >
+                            <AiOutlineCloudUpload size={20} />
+                            <span className="text-sm flex-1">Upload Doc</span>
+                          </button>
+                          <span>or</span>
+                          <div className="bg-[#E4E4E4]/60 px-6 py-2 rounded-lg flex items-center justify-center gap-2 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={
+                                (getWritten[obj._id] !== undefined &&
+                                  getWritten[obj._id]) ||
+                                obj.getWritten ||
+                                false
+                              }
+                              onChange={(e) => handleGetWritten(e, obj?._id)}
+                              className="w-4 h-4 bg-transparent"
+                            />
+                            <span className="text-sm flex-1">
+                              Get it written
+                            </span>
+                          </div>
+                        </div>
+                        <button>
+                          <IoMdClose size={20} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <p className="text-xl font-medium">No Items in Cart</p>
+                  <Link
+                    to="/"
+                    className="bg-black text-white py-3 px-6 rounded w-max"
+                  >
+                    Add Item To Cart
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

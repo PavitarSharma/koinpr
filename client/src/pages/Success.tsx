@@ -1,6 +1,10 @@
+import { useEffect } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 const Success = () => {
+  useEffect(() => {
+    document.title = "Success"
+  }, [])
   return (
     <div className="bg-green-200 h-screen flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-4">
