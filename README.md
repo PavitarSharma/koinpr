@@ -88,14 +88,16 @@ To start the development servers, use the following commands:
 ```sh
 cd client
 npm start
+```
 
-Navigate to http://localhost:3000 to view the application in the browser.
+Navigate to http://localhost:3000 to view the application in the browser. 
+
 
 ### Backend
 ```sh
 cd server
 npm start
-
+```
 
 ### Contributing
 
