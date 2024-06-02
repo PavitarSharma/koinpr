@@ -36,7 +36,7 @@ const Input: React.FC<InputProps> = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full rounded-lg border border-gray-300 p-2  outline-0 text-gray-700 ${StartIcon && "pl-6"}`}
+          className={`w-full rounded-lg border border-gray-300 p-2  outline-0 text-gray-700 ${StartIcon && "pl-6"} placeholder:text-sm placeholder:text-[#474747]`}
         />
       </div>
       {error && <p className="text-xs text-red-500">{error}</p>}

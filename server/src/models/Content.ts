@@ -56,7 +56,7 @@ const contentSchema = new Schema<ContectDoc>({
     },
     offerings: { type: [offeringSchema], required: true },
     visited: { type: Number, default: 0 },
-    // user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    user: { type: Schema.Types.ObjectId, ref: "User" },
 }, {
     timestamps: true
 })

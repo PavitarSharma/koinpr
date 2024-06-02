@@ -7,7 +7,10 @@ class ContentService {
     }
 
     async getContents() {
-        return await Content.find()
+        const contents = await Content.find()
+        return {
+            data: contents
+        }
     }
 
     async getContent(id: string) {

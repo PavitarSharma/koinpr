@@ -44,3 +44,15 @@ ul {
 .divider {
   @apply w-full h-[1px] bg-gray-300;
 }
+
+.scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded-xl h-10;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

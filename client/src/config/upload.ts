@@ -19,3 +19,15 @@ export const uploadCaseStudy = async (formData: FormData) => {
 
     return response.data
 }
+
+export const uploadCartDoc = async (formData: FormData) => {
+    const response = await axiosInstance.post("/carts/uploadDoc", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("todayqToken")}`,
+        },
+        withCredentials: true,
+    })
+
+    return response.data
+}

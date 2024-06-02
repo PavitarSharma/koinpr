@@ -26,3 +26,10 @@ export interface AddContentInputs {
     companyLogo: Image;
     offerings: OfferingInputs[];
 }
+
+
+export type AuthPayload = {
+    id: string;
+    email: string;
+    role: string;
+}

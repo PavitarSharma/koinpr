@@ -58,3 +58,15 @@ export const offerings = [
 ]
 
 export const features = ["Google Index", "Social Share", "Hompage Placement", "Gambling"]
+
+export const productTypes = ["Gambling", "Adult", "Web 3.0"]
+
+export const budgets = ["₹0-₹100", "₹100-₹500", "₹500-₹1000", "Above 1000"]
+
+export const USER = {
+    _id: "7a4d435d-5718-4835-8da6-2069de36dd32",
+    name: 'Joseph Altmen Dos',
+    email: 'josephaltmen@gmail.com',
+    password: 'test@1234',
+    role: "Advertiser"
+}
