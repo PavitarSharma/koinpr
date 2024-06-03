@@ -3,7 +3,11 @@ import { FaFilter } from "react-icons/fa";
 import { useFilter } from "../../store";
 import SideFilter from "./SideFilter";
 import { useFilterContext } from "../../hooks/useGlobalState";
+import { IoMdAdd } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
+
 const Topbar = () => {
+  const navigate = useNavigate()
   const { data: contents } = useContents();
   const filterStore = useFilter();
   const { searchTerm, setSearchTerm } = useFilterContext();
@@ -15,11 +19,16 @@ const Topbar = () => {
   return (
     <>
       <div>
-        <div className="flex sm:items-center gap-4 justify-between sm:flex-row flex-col">
+        <div className="flex md:items-center gap-4 justify-between md:flex-row flex-col">
           <h1 className="text-[#18171C] sm:text-3xl text-2xl font-semibold">
             Koinpr Marketplace
           </h1>
 
+          <div className="flex sm:items-center gap-4 sm:flex-row flex-col">
+          <button onClick={() => navigate("/add-offering")} className="flex items-center justify-center gap-2 bg-black text-white px-8 py-3 rounded">
+            <IoMdAdd size={22} />
+            <span>Add Offering</span>
+            </button>
           <div>
             <input
               type="text"
@@ -28,6 +37,7 @@ const Topbar = () => {
               onChange={handleSearchChange}
               className="rounded-lg border border-gray-300 px-2 py-3 sm:max-w-[374px] w-full outline-0 text-gray-700"
             />
+          </div>
           </div>
         </div>
 
