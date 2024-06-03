@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Contents, SideFilter, Topbar, Topbrands } from "../components";
+import { Contents, SideFilter, Topbar } from "../components";
 
 const Home = () => {
   useEffect(() => {
@@ -18,7 +18,7 @@ const Home = () => {
         <Topbar />
         <div className="flex gap-6">
           <Contents />
-          <Topbrands />
+          {/* <Topbrands /> */}
         </div>
       </div>
     </div>

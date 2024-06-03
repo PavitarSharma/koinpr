@@ -33,3 +33,14 @@ export type AuthPayload = {
     email: string;
     role: string;
 }
+
+export interface Filters {
+    categories?: string[];
+    productTypes?: string[];
+    regions?: string[];
+    languages?: string[];
+    budget?: string;
+    q?: string;
+    page?: number;
+    limit?: number;
+}

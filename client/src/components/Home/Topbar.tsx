@@ -2,9 +2,16 @@ import useContents from "../../hooks/useContents";
 import { FaFilter } from "react-icons/fa";
 import { useFilter } from "../../store";
 import SideFilter from "./SideFilter";
+import { useFilterContext } from "../../hooks/useGlobalState";
 const Topbar = () => {
   const { data: contents } = useContents();
   const filterStore = useFilter();
+  const { searchTerm, setSearchTerm } = useFilterContext();
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+  
   return (
     <>
       <div>
@@ -17,6 +24,8 @@ const Topbar = () => {
             <input
               type="text"
               placeholder="Search"
+              value={searchTerm}
+              onChange={handleSearchChange}
               className="rounded-lg border border-gray-300 px-2 py-3 sm:max-w-[374px] w-full outline-0 text-gray-700"
             />
           </div>
@@ -27,7 +36,7 @@ const Topbar = () => {
             <p>
               <span className="font-semibold">Showing Result</span>:{" "}
               <span className="text-[#3772FF] font-semibold">
-                {contents?.data?.length}
+                {contents?.totals}
               </span>
             </p>
             <p className="text-[#A4A4A4]">Content distribution</p>
@@ -41,11 +50,11 @@ const Topbar = () => {
           </button>
         </div>
       </div>
-      {
-        filterStore.isOpen && <div className="lg:hidden block">
-        <SideFilter isMobile />
-      </div>
-      }
+      {filterStore.isOpen && (
+        <div className="lg:hidden block">
+          <SideFilter isMobile />
+        </div>
+      )}
     </>
   );
 };

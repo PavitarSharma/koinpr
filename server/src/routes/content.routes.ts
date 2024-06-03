@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const contents = await contentService.getContents();
+        const contents = await contentService.getContents(req.query);
         res.status(200).json(contents)
     } catch (error: any) {
         return next(new ErrorHandler(500, error.message))

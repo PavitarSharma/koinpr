@@ -11,6 +11,12 @@ export interface FilterContextType {
   setProductTypeFilter: React.Dispatch<React.SetStateAction<string[]>>;
   budget: string;
   setBudget: React.Dispatch<React.SetStateAction<string>>;
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  limit: number;
+  setLimit: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const FilterContext = createContext<FilterContextType | null>(null);
@@ -25,7 +31,9 @@ export const FilterContextProvider = ({
   const [languagesFilter, setLanguagesFilter] = useState<string[]>([]);
   const [productTypeFilter, setProductTypeFilter] = useState<string[]>([]);
   const [budget, setBudget] = useState("");
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(6)
 
   const value = {
     categoriesFilter,
@@ -38,6 +46,12 @@ export const FilterContextProvider = ({
     setProductTypeFilter,
     budget,
     setBudget,
+    searchTerm,
+    setSearchTerm,
+    page,
+    setPage,
+    limit,
+    setLimit,
   };
   return (
     <FilterContext.Provider value={value}>{children}</FilterContext.Provider>

@@ -7,15 +7,65 @@ import {
   productTypes,
   regions,
 } from "../../constants";
+import { useFilterContext } from "../../hooks/useGlobalState";
 
-const SideFilter = ({ isMobile = false}: { isMobile?: boolean}) => {
+const SideFilter = ({ isMobile = false }: { isMobile?: boolean }) => {
+  const {
+    setCategoriesFilter,
+    setLanguagesFilter,
+    setRegionsFilter,
+    setProductTypeFilter,
+    setBudget,
+    budget
+  } = useFilterContext();
   const categoryToggle = useToggle(true);
   const languageToggle = useToggle(false);
   const regionToggle = useToggle(false);
   const productTypeToggle = useToggle(true);
   const budgetToggle = useToggle(true);
+
+  const handleCheckboxChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setFilter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    const { checked, value } = event.target;
+
+    setFilter((prevState) =>
+      checked
+        ? [...prevState, value]
+        : prevState.filter((item) => item !== value)
+    );
+  };
+
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleCheckboxChange(event, setCategoriesFilter);
+  };
+
+  const handleLanguageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleCheckboxChange(event, setLanguagesFilter);
+  };
+
+  const handleRegionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleCheckboxChange(event, setRegionsFilter);
+  };
+
+  const handleProductTypeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    handleCheckboxChange(event, setProductTypeFilter);
+  };
+
+  const handleBudgetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+
+    setBudget(value);
+  };
   return (
-    <div className={`w-[222px] card h-max space-y-8 ${isMobile && "fixed top-[70px] left-0 h-screen"}`}>
+    <div
+      className={`w-[222px] card h-max space-y-8 ${
+        isMobile && "fixed top-[70px] left-0 h-screen"
+      }`}
+    >
       {/* Categories Filter */}
       <div className="">
         <div
@@ -35,6 +85,8 @@ const SideFilter = ({ isMobile = false}: { isMobile?: boolean}) => {
               <div key={index} className="flex gap-3">
                 <input
                   type="checkbox"
+                  value={option.value}
+                  onChange={handleCategoryChange}
                   id={`category-${option.value}`}
                   className="rounded-lg border border-gray-300 p-2 w-4 h-4 outline-0 text-gray-700"
                 />
@@ -66,6 +118,8 @@ const SideFilter = ({ isMobile = false}: { isMobile?: boolean}) => {
               <div key={index} className="flex gap-3">
                 <input
                   type="checkbox"
+                  value={option.value}
+                  onChange={handleLanguageChange}
                   id={`language-${option.value}`}
                   className="rounded-lg border border-gray-300 p-2 w-4 h-4 outline-0 text-gray-700"
                 />
@@ -98,6 +152,8 @@ const SideFilter = ({ isMobile = false}: { isMobile?: boolean}) => {
                 <input
                   type="checkbox"
                   id={`region-${option.value}`}
+                  value={option.value}
+                  onChange={handleRegionChange}
                   className="rounded-lg border border-gray-300 p-2 w-4 h-4 outline-0 text-gray-700"
                 />
                 <label htmlFor={`region-${option.value}`} className="text-sm">
@@ -129,6 +185,8 @@ const SideFilter = ({ isMobile = false}: { isMobile?: boolean}) => {
                 <input
                   type="checkbox"
                   id={`productType-${option}`}
+                  value={option}
+                  onChange={handleProductTypeChange}
                   className="rounded-lg border border-gray-300 p-2 w-4 h-4 outline-0 text-gray-700"
                 />
                 <label htmlFor={`productType-${option}`} className="text-sm">
@@ -160,6 +218,9 @@ const SideFilter = ({ isMobile = false}: { isMobile?: boolean}) => {
                 <input
                   type="radio"
                   id={`productType-${option}`}
+                  value={option}
+                  checked={budget === option}
+                  onChange={handleBudgetChange}
                   className="rounded-lg border border-gray-300 p-2 w-4 h-4 outline-0 text-gray-700"
                 />
                 <label htmlFor={`productType-${option}`} className="text-sm">
