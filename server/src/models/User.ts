@@ -11,6 +11,7 @@ export interface UserDoc extends Document {
     state: string;
     bookmarks: [any];
     orders: [any];
+    contents: [any];
 }
 
 const userSchema = new Schema<UserDoc>({
@@ -39,6 +40,12 @@ const userSchema = new Schema<UserDoc>({
             ref: "Order"
         }
     ],
+    contents: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Content"
+        }
+    ]
 
 }, {
     timestamps: true,

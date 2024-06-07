@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import { deleteImage, ErrorHandler, UploadedFile, uploadImage } from "../utils";
-import { contentService } from "../services";
-import { upload } from "../middlewares";
+import { contentService, userService } from "../services";
+import { isAuthenticated, upload } from "../middlewares";
 
 const router = express.Router();
 
@@ -24,9 +24,22 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
     }
 })
 
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/",isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+
     try {
+        const user = req.user
+        if (!user) {
+            return next(new ErrorHandler(404, "Unauthorized please login to add to wishlist"))
+        }
+
+        const findUser = await userService.findUserWithId(user.id)
+        if (!findUser) {
+            return next(new ErrorHandler(404, "User not found"))
+        }
+        
         const content = await contentService.addContent(req.body);
+        findUser.contents.push(content._id)
+        await findUser.save();
         res.status(201).json(content)
     } catch (error: any) {
         return next(new ErrorHandler(500, error.message))

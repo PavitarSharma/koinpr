@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AiOutlineEdit } from "react-icons/ai";
-import { useAddOfferingContext } from "../../../hooks/useGlobalState";
+import {
+  useAddOfferingContext,
+  useAuthContext,
+} from "../../../hooks/useGlobalState";
 import { FaRegFileLines } from "react-icons/fa6";
 import { MdOutlinePayments } from "react-icons/md";
 import { formatPrice } from "../../../utils";
@@ -13,6 +16,7 @@ import { axiosInstance, uploadCaseStudy } from "../../../config";
 const ReviewStep = () => {
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuthContext();
   const {
     formData,
     offerings,
@@ -68,7 +72,12 @@ const ReviewStep = () => {
 
   const mutation = useMutation({
     mutationFn: async (newContent) => {
-      return await axiosInstance.post("/contents", newContent);
+      return await axiosInstance.post("/contents", newContent, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("todayqToken")}`,
+        },
+        withCredentials: true,
+      });
     },
     onSuccess: () => {
       enqueueSnackbar("Offering created successfully", { variant: "success" });
@@ -80,6 +89,10 @@ const ReviewStep = () => {
   });
 
   const onSubmit = () => {
+    if (!user) {
+      enqueueSnackbar("Please login", { variant: "error" });
+      return;
+    }
     const newContent = {
       ...formData,
       category: formData.category.value,
@@ -90,7 +103,7 @@ const ReviewStep = () => {
       offerings: offerings.map((offering) => ({
         mediaKitPrice: Number(offering.mediaKitPrice),
         discountPrice: Number(offering.discountPrice) || 0,
-        features: offering.features.map((feature: any) => feature.value),
+        features: offering.features,
         offering: offering.offering.value,
       })),
     };
@@ -184,7 +197,11 @@ const ReviewStep = () => {
             <span className="flex-1 text-center px-4">
               {caseStudyFile?.name}
             </span>
-            <a href={caseStudy?.url} target="_blank" className="px-6 rounded-r flex items-center justify-center border-l border-gray-200">
+            <a
+              href={caseStudy?.url}
+              target="_blank"
+              className="px-6 rounded-r flex items-center justify-center border-l border-gray-200"
+            >
               View
             </a>
           </div>

@@ -1,8 +1,27 @@
 import express, { NextFunction, Request, Response } from "express";
 import { ErrorHandler } from "../utils";
 import { userService } from "../services";
+import { isAuthenticated } from "../middlewares";
 
 const router = express.Router();
+
+router.get("/contents", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = req.user
+        if (!user) {
+            return res.status(200).json([])
+        }
+        const findUser = await userService.findUser(user.id)
+        if (!findUser) {
+            return next(new ErrorHandler(404, "User not found"))
+        }
+
+        res.status(200).json(findUser.contents)
+
+    } catch (error: any) {
+        return next(new ErrorHandler(500, error.message))
+    }
+})
 
 router.post("/signup", async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -41,6 +60,8 @@ router.post("/login", async (req: Request, res: Response, next: NextFunction) =>
     } catch (error: any) {
         return next(new ErrorHandler(500, error.message))
     }
+
+    
 })
 
 export { router as userRoutes }

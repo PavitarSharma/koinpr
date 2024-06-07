@@ -12,6 +12,10 @@ class UserService {
         return await User.findById(id)
     }
 
+    async findUser(id: string): Promise<UserDoc | null> {
+        return await User.findById(id).populate("contents")
+    }
+
     async createUser(data: any): Promise<UserDoc> {
         return await User.create(data);
     }

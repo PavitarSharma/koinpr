@@ -62,7 +62,7 @@ class ContentService {
             }
         }
 
-        const contents = await Content.find(query)
+        const contents = await Content.find(query).sort({ createdAt: -1})
 
         const allOfferings = contents.flatMap(content => 
             content.offerings.map(offering => ({

@@ -36,7 +36,7 @@ const Content: React.FC<ContentProps> = ({ data }) => {
               <div className="flex justify-between items-start">
                 <img
                   onClick={() => navigate(`/content/${_id}/product/${offering?._id}`)}
-                  src={companyLogo.url}
+                  src={companyLogo?.url}
                   alt={`${websiteName}`}
                   className="w-11 h-11 rounded-full object-cover cursor-pointer"
                 />
